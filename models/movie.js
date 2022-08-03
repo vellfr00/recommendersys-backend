@@ -26,8 +26,8 @@ const MovieSchema = mongoose.Schema({
         required: true
     },
 
-    prob_index: {
-        type: Number,
+    probIndex: {
+        type: Number
     }
 });
 
