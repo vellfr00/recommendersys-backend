@@ -3,9 +3,11 @@ const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
+import methodOverride from "method-override";
+
 require('dotenv').config();
 
-const indexRouter = require('./routes/index');
+const apiRouter = require('./routes/api');
 
 const server = express();
 
@@ -16,7 +18,13 @@ server.use(express.urlencoded({ extended: false }));
 
 server.use(express.static(path.join(__dirname, 'public')));
 
-server.use('/', indexRouter);
+server.use(
+    methodOverride("_method", {
+        methods: ["POST", "GET"],
+    })
+);
+
+server.use('/api', apiRouter);
 
 mongoose.connect(process.env.DB_URI, {
     useNewUrlParser: true,
