@@ -7,16 +7,16 @@ require('dotenv').config();
 
 const indexRouter = require('./routes/index');
 
-const app = express();
+const server = express();
 
-app.use(cors);
+server.use(cors);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+server.use(express.json());
+server.use(express.urlencoded({ extended: false }));
 
-app.use(express.static(path.join(__dirname, 'public')));
+server.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+server.use('/', indexRouter);
 
 mongoose.connect(process.env.DB_URI, {
     useNewUrlParser: true,
@@ -32,7 +32,7 @@ db.once('open', function(error) {
     } else {
         console.log("Database connected, starting server...");
 
-        app.listen(process.env.PORT, function(err) {
+        server.listen(process.env.PORT, function(err) {
             if(err) {
                 console.log("Cannot start server: " + err);
             } else {
