@@ -1,9 +1,9 @@
-const User = require('../models/user');
+const Users = require('../models/user');
 
 module.exports = {
     //POST Handler - Register a new user
     registerUser: (req, res, next) => {
-        const newUser = new User({
+        const newUser = new Users({
             username: req.body.username,
             firstname: req.body.firstname,
             lastname: req.body.lastname,
@@ -29,7 +29,7 @@ module.exports = {
 
     //DELETE Handler - Delete user by username
     deleteUser: (req, res, next) => {
-        User.deleteOne({username: req.params.username})
+        Users.deleteOne({username: req.params.username})
             .then((document) => {
                 console.log("Deleted user: " + req.params.username);
 
