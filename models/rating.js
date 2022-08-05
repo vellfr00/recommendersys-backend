@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
 
-const RatingSchema = mongoose.Schema({
+const ratingSchema = mongoose.Schema({
     username: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        type: String,
         required: true
     },
 
@@ -23,4 +22,11 @@ const RatingSchema = mongoose.Schema({
     }
 });
 
-export default mongoose.model("Rating", RatingSchema);
+ratingSchema.virtual("user", {
+    ref: "User",
+    localField: "username",
+    foreignField: "username",
+    justOne: true
+});
+
+module.exports = mongoose.model("Rating", ratingSchema);

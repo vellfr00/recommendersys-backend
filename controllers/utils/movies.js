@@ -1,4 +1,4 @@
-const Movies = require('../models/movie');
+const Movies = require('../../models/movie');
 
 module.exports = {
     //Function to get n random movies

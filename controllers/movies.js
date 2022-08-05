@@ -1,5 +1,5 @@
 const Movies = require('../models/movie');
-const moviesUtils = require('../utils/movies');
+const moviesUtils = require('./utils/movies');
 
 require('dotenv').config();
 
@@ -17,14 +17,12 @@ module.exports = {
                 break;
             default:
                 res.status(400);
-                res.json({message: "Invalid movies selection policy"});
-                res.end();
-
-                next();
+                next("Invalid movies selection policy");
+                return;
         }
 
         res.status(200);
-        res.json({selection: movies});
+        res.json({proposed: movies});
         res.end();
     }
 };

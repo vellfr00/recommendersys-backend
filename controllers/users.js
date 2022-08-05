@@ -1,4 +1,5 @@
 const Users = require('../models/user');
+const Preferences = require('../models/preferences');
 
 module.exports = {
     //POST Handler - Register a new user
@@ -12,8 +13,13 @@ module.exports = {
             elicitationId: req.body.elicitationId
         });
 
+        const newUserPreferences = new Preferences({
+            username: req.body.username
+        });
+
         newUser.save()
-            .then((document) => {
+            .then((userDocument) => newUserPreferences.save())
+            .then((prefDocument) => {
                 console.log("New user registered: " + req.body.username);
 
                 res.status(200);
@@ -22,8 +28,7 @@ module.exports = {
                 console.log("Cannot register new user: " + error);
 
                 res.status(500);
-                res.json({message: error.message});
-                res.end();
+                next("Cannot register new user: " + error.message);
         });
     },
 
@@ -39,8 +44,7 @@ module.exports = {
                 console.log("Cannot delete user: " + error);
 
                 res.status(500);
-                res.json({message: error.message});
-                res.end();
+                next("Cannot delete user: " + error.message);
         });
     }
 };
