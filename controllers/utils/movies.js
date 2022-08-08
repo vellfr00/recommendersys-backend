@@ -11,23 +11,25 @@ module.exports = {
 
     //Function to get n random movies that takes into consideration the probability of each movie
     getRandomProbabilityMovies: async (n) => {
+        //Get a random movie based on probability
+        function getRandomProbabilityMovie(mList) {
+            let num = Math.random(), s = 0, lastIndex = mList.length - 1;
+            for(let i = 0; i < lastIndex; ++i) {
+                s += mList[i].probIndex;
+                if (num < s)
+                    return mList[i];
+            }
+
+            return mList[lastIndex];
+        }
+
         if(typeof n === 'string' || n instanceof String)
             n = parseInt(n);
 
-        let proposed = [], mList = await Movies.find({});
+        let proposed = [], movies = await Movies.find({});
+        for(let i = 0; i < n; i++)
+            proposed.push(getRandomProbabilityMovie(movies));
 
-        let num = Math.random(), s = 0, lastIndex = mList.length - 1;
-        for (let i = 0; i < lastIndex; ++i) {
-            s += mList[i].probIndex;
-
-            if(s > num && proposed.length < n)
-                proposed.push(mList[i]);
-
-            if(proposed.length === n)
-                break;
-        }
-
-        //If proposed array is not full yet, fill it with random movies, else return proposed
-        return (proposed.length < n) ? proposed.concat(await module.exports.getRandomMovies(n - proposed.length)) : proposed;
+        return proposed;
     }
 };
