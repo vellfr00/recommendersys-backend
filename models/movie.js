@@ -2,10 +2,20 @@ const mongoose = require('mongoose');
 
 const movieSchema = mongoose.Schema({
     movieId: {
-        type: String,
+        type: Number,
         required: true,
         unique: true,
         index: true
+    },
+
+    title: {
+        type: String,
+        required: true
+    },
+
+    genres: {
+        type: String,
+        required: true
     },
 
     imdbId: {
@@ -18,16 +28,6 @@ const movieSchema = mongoose.Schema({
         type: String,
         required: true,
         unique: true
-    },
-
-    title: {
-        type: String,
-        required: true
-    },
-
-    genres: {
-        type: String,
-        required: true
     },
 
     probIndex: {

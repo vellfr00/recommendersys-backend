@@ -3,7 +3,7 @@ const {mongo, Schema} = require("mongoose");
 
 const movieReference = new mongoose.Schema({
     movieId: {
-        type: String,
+        type: Number,
         required: true
     }
 }, { _id: false });
@@ -40,7 +40,7 @@ const userPreferencesSchema = new mongoose.Schema({
         }
     }, {_id: false})],
 
-    orderPreferences: [new Schema({
+    orderingPreferences: [new Schema({
         timestamp: {
             type: Date,
             default: Date.now
