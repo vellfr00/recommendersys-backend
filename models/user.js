@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema({
 
     elicitationId: {
         type: Number,
+        required: true,
         maxlength: 6
     }
 });

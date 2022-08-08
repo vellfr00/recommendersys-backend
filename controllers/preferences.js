@@ -16,7 +16,7 @@ const preferencesController = {
                 }
 
                 let newSelectionPreference = preferencesUtils.buildSelectionPreference(proposed, choice);
-                Preferences.findOneAndUpdate({username: username}, {$push: {selectionPreferences: newSelectionPreference}})
+                Preferences.findOneAndUpdate({username: username}, {$push: {selectionPreferences: newSelectionPreference, toRate: {movieId: choice}}})
                     .then((document) => {
                         res.status(200);
                         res.end();
@@ -61,7 +61,7 @@ const preferencesController = {
 
         switch(req.query.type) {
             case 'selection':
-                Preferences.findOne({username: username}, 'selectionPreferences')
+                Preferences.findOne({username: username}, {_id: 0, selectionPreferences: 1})
                     .then((document) => {
                         if(!document) {
                             res.status(404);
@@ -82,7 +82,7 @@ const preferencesController = {
 
                 break;
             case 'ordering':
-                Preferences.findOne({username: username}, 'orderingPreferences')
+                Preferences.findOne({username: username}, {_id: 0, orderingPreferences: 1})
                     .then((document) => {
                         if(!document) {
                             res.status(404);

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const ratingSchema = mongoose.Schema({
     username: {
@@ -7,13 +7,15 @@ const ratingSchema = mongoose.Schema({
     },
 
     movieId: {
-        type: String,
+        type: Number,
         required: true
     },
 
     rating: {
         type: Number,
-        required: true
+        required: true,
+        min: 0,
+        max: 5
     },
 
     timestamp: {
@@ -26,6 +28,13 @@ ratingSchema.virtual("user", {
     ref: "User",
     localField: "username",
     foreignField: "username",
+    justOne: true
+});
+
+ratingSchema.virtual("movie", {
+    ref: "Movie",
+    localField: "movieId",
+    foreignField: "movieId",
     justOne: true
 });
 

@@ -6,7 +6,20 @@ require('dotenv').config();
 module.exports = {
     //GET Handler - get a list of movies to select one from
     getProposedMovies: async (req, res, next) => {
-        let movies, n = process.env.MOVIES_SELECTION;
+        let movies, n;
+
+        switch (req.query.type) {
+            case 'selection':
+                n = process.env.MOVIES_SELECTION;
+                break;
+            case 'ordering':
+                n = process.env.MOVIES_ORDERING;
+                break;
+            default:
+                res.status(400);
+                next("Invalid movies propose type");
+                return;
+        }
 
         switch (req.query.policy) {
             case 'random':

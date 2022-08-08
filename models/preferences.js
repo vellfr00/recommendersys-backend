@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-const {mongo, Schema} = require("mongoose");
+const {mongoose, Schema} = require("mongoose");
 
 const movieReference = new mongoose.Schema({
     movieId: {
@@ -55,7 +54,9 @@ const userPreferencesSchema = new mongoose.Schema({
             type: [movieReference],
             required: true
         }
-    }, {_id: false})]
+    }, {_id: false})],
+
+    toRate: [movieReference]
 });
 
 userPreferencesSchema.virtual("user", {
