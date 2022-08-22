@@ -46,5 +46,28 @@ module.exports = {
                 res.status(500);
                 next("Cannot delete user: " + error.message);
         });
+    },
+
+    //GET Handler - Check if user exists and return user
+    getUser: (req, res, next) => {
+        Users.findOne({$and: [{username: req.params.username}, {elicitationId: req.body.elicitationId}]})
+            .then((document) => {
+                if(!document) {
+                    res.status(404);
+                    next("Wrong username or elicitationId");
+
+                    return;
+                }
+
+                res.status(200);
+
+                res.json(document);
+                res.end();
+            }).catch((error) => {
+                console.log("Cannot find user: " + error);
+
+                res.status(500);
+                next("Cannot find user: " + error.message);
+        });
     }
 };
