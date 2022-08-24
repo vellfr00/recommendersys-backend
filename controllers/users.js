@@ -48,9 +48,16 @@ module.exports = {
         });
     },
 
-    //GET Handler - Check if user exists and return user
+    //POST Handler - Check if user exists and return user
     getUser: (req, res, next) => {
-        Users.findOne({$and: [{username: req.params.username}, {elicitationId: req.body.elicitationId}]})
+        if(!req.params.username || !req.query.elicitationId) {
+            res.status(400);
+            next("Missing username or elicitationId");
+
+            return;
+        }
+
+        Users.findOne({$and: [{username: req.params.username}, {elicitationId: req.query.elicitationId}]})
             .then((document) => {
                 if(!document) {
                     res.status(404);
