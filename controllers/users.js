@@ -57,7 +57,8 @@ module.exports = {
             return;
         }
 
-        Users.findOne({$and: [{username: req.params.username}, {elicitationId: req.query.elicitationId}]})
+        Users.findOne({$and: [{username: req.params.username}, {elicitationId: req.query.elicitationId}]},
+            {_id: 0, username: 1, firstname: 1, lastname: 1, gender: 1, age: 1})
             .then((document) => {
                 if(!document) {
                     res.status(404);
