@@ -1,4 +1,4 @@
-const {mongoose, Schema} = require("mongoose");
+const {mongoose} = require("mongoose");
 
 const movieReference = new mongoose.Schema({
     movieId: {
@@ -28,31 +28,54 @@ const userPreferencesSchema = new mongoose.Schema({
             default: Date.now
         },
 
-        proposed: {
-            type: [movieReference],
-            required: true
-        },
+        elicitationData: [new mongoose.Schema({
+            proposed: {
+                type: [movieReference],
+                required: true
+            },
 
-        choice: {
-            type: movieReference,
-            required: true
-        }
+            choice: {
+                type: movieReference,
+                required: true
+            }
+        }, {_id: false})]
     }, {_id: false})],
 
-    orderingPreferences: [new Schema({
+    orderingPreferences: [new mongoose.Schema({
         timestamp: {
             type: Date,
             default: Date.now
         },
 
-        proposed: {
-            type: [movieReference],
+        elicitationData: [new mongoose.Schema({
+            proposed: {
+                type: [movieReference],
+                required: true
+            },
+
+            choice: {
+                type: [movieReference],
+                required: true
+            }
+        }, {_id: false})]
+    }, {_id: false})],
+
+    ratings: [new mongoose.Schema({
+        movie: {
+            type: movieReference,
             required: true
         },
 
-        choice: {
-            type: [movieReference],
-            required: true
+        rating: {
+            type: Number,
+            required: true,
+            min: 0,
+            max: 5
+        },
+
+        timestamp: {
+            type: Date,
+            default: Date.now
         }
     }, {_id: false})],
 

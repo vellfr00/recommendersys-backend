@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const passportLocalMongoose = require('passport-local-mongoose');
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -26,13 +27,11 @@ const userSchema = new mongoose.Schema({
     gender: {
         type: String,
         required: true
-    },
-
-    elicitationId: {
-        type: Number,
-        required: true,
-        maxlength: 6
     }
+});
+
+userSchema.plugin(passportLocalMongoose, {
+    usernameField: "username"
 });
 
 module.exports = mongoose.model("User", userSchema);

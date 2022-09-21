@@ -1,4 +1,3 @@
-const Ratings = require('../models/rating');
 const Movies = require('../models/movie');
 const Preferences = require('../models/preferences');
 
@@ -9,9 +8,9 @@ const ratingsController = {
 
         switch(req.query.rated) {
             case 'true':
-                Ratings.find({username: username}).populate('movie')
+                Preferences.findOne({username: username}, {_id: 0, ratings: 1})
                     .then((document) => {
-                        if(!document) {
+                        if(!document || document.ratings.length === 0) {
                             res.status(404);
                             next("No ratings for user " + username);
                             return;
@@ -21,11 +20,11 @@ const ratingsController = {
                         res.json(document);
                         res.end();
                     }).catch((error) => {
-                    console.log("Cannot get user ratings: " + error);
+                        console.log("Cannot get user ratings: " + error);
 
-                    res.status(500);
-                    res.json({message: "Cannot get user ratings: " + error.message});
-                    res.end();
+                        res.status(500);
+                        res.json({message: "Cannot get user ratings: " + error.message});
+                        res.end();
                 });
 
                 break;
@@ -72,42 +71,64 @@ const ratingsController = {
     addRating: async (req, res, next) => {
         let max, id = req.params.movieId;
 
-        //If user already left a rating for this movie, give error
-        let rating = await Ratings.findOne({username: req.body.username, movieId: id});
-        if(rating) {
-            res.status(400);
-            next("Cannot add rating: user already left a rating for this movie");
-            return;
-        }
+        let ratings = await Preferences.findOne({username: req.body.username}, {_id: 0, ratings: 1});
+        Preferences.findOne({username: req.body.username}, {_id: 0, ratings: 1})
+            .then((document) => {
+                //If user already left a rating for this movie, give error
+                let ratings = document.ratings.map((ratingDoc) => ratingDoc.movie.movieId);
+                if(ratings.includes(parseInt(id))) {
+                    res.status(400);
+                    next("Invalid request data: user already rated this movie");
 
-        const newRating = new Ratings({
-            username: req.body.username,
-            movieId: id,
-            rating: req.body.rating
-        });
+                    return;
+                }
 
-        newRating.save()
-            .then((document) => Preferences.findOneAndUpdate({username: req.body.username}, {$pull: {toRate: {movieId: id}}}))
-            .then((document) => Ratings.countDocuments())
-            .then((count) => {
-                max = count;
+                const newRating = {
+                    movie: {movieId: id},
+                    rating: req.body.rating
+                };
 
-                return Ratings.aggregate([
-                    {$group: {_id: "$movieId", count: {$sum: 1}}},
-                    {$sort: {count: -1}},
-                ]);
-            }).then((rs) => {
-            rs.forEach((el) => {
-                Movies.updateOne({movieId: el._id}, {$set: {probIndex: el.count / max}});
-            });
-        }).then((doc) => {
-            res.status(200);
-            res.end();
-        }).catch((error) => {
-            console.log("Cannot add rating: " + error);
+                Preferences.findOneAndUpdate({username: req.body.username},
+                    {$push: {ratings: newRating}, $pull: {toRate: {movieId: id}}})
+                    .then((document) => { return Preferences.find({}, {_id: 0, ratings: 1}) })
+                    .then(async (preferences) => {
+                        let N = await Movies.countDocuments();
+                        let R = 0, ratings = [];
 
+                        preferences.forEach((p) => {
+                            let r = p.ratings;
+                            r.forEach((rating) => {
+                                let index = ratings.findIndex((e) => e.movieId === rating.movie.movieId);
+
+                                if (index === -1) {
+                                    ratings.push({movieId: rating.movie.movieId, count: 1});
+                                } else {
+                                    let c = ratings[index].count + 1;
+                                    ratings[index] = {movieId: rating.movie.movieId, count: c};
+                                }
+
+                                R += 1;
+                            });
+                        });
+
+                        let index = ratings.findIndex((e) => e.movieId === parseInt(id));
+                        let n_i = (ratings[index]).count;
+
+                        let decrease = n_i / (2 * R * N);
+                        let increase = n_i / (2 * R * N * (N - 1));
+
+                        await Movies.findOneAndUpdate({movieId: id}, {$inc: {probIndex: -decrease}});
+                        await Movies.updateMany({$not: {movieId: id}}, {$inc: {probIndex: increase}});
+
+                        res.status(200);
+                        res.end();
+                    }).catch((error) => {
+                        res.status(500);
+                        next(error.message);
+                });
+            }).catch((error) => {
             res.status(500);
-            next("Cannot add rating: " + error.message);
+            next(error.message);
         });
     }
 };

@@ -3,20 +3,23 @@ const preferencesUtils = require('./utils/preferences');
 
 const preferencesController = {
     //POST Handler - Add new selection preference
-    addPreference: (req, res, next) => {
+    addPreference: async (req, res, next) => {
         let username = req.params.username;
         let proposed = req.body.proposed, choice = req.body.choice;
 
-        switch(req.query.type) {
+        switch (req.query.type) {
             case 'selection':
-                if(!preferencesUtils.selectionDataIsValid(proposed, choice)) {
+                if (!(await preferencesUtils.selectionDataIsValid(proposed, choice))) {
                     res.status(400);
-                    next("Invalid request data");
+                    next("Invalid request data: data not coherent or not enough elicitation iterations");
                     return;
                 }
 
                 let newSelectionPreference = preferencesUtils.buildSelectionPreference(proposed, choice);
-                Preferences.findOneAndUpdate({username: username}, {$push: {selectionPreferences: newSelectionPreference, toRate: {movieId: choice}}})
+                let toRatePush = choice.map(c => ({movieId: c}));
+
+                Preferences.findOneAndUpdate({username: username},
+                    {$push: {selectionPreferences: newSelectionPreference, toRate: toRatePush}})
                     .then((document) => {
                         res.status(200);
                         res.end();
@@ -29,22 +32,23 @@ const preferencesController = {
 
                 break;
             case 'ordering':
-                if(!preferencesUtils.orderingDataIsValid(proposed, choice)) {
+                if (!(await preferencesUtils.orderingDataIsValid(proposed, choice))) {
                     res.status(400);
-                    next("Invalid request data");
+                    next("Invalid request data: data not coherent or not enough elicitation iterations");
                     return;
                 }
 
                 let newOrderingPreferences = preferencesUtils.buildOrderingPreference(proposed, choice);
-                Preferences.findOneAndUpdate({username: username}, {$push: {orderingPreferences: newOrderingPreferences}})
+                Preferences.findOneAndUpdate({username: username},
+                    {$push: {orderingPreferences: newOrderingPreferences}})
                     .then((document) => {
                         res.status(200);
                         res.end();
                     }).catch((error) => {
-                        console.log("Cannot add preference: " + error);
+                    console.log("Cannot add preference: " + error);
 
-                        res.status(500);
-                        next("Cannot add preference: " + error.message);
+                    res.status(500);
+                    next("Cannot add preference: " + error.message);
                 });
 
                 break;

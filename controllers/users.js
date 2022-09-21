@@ -9,8 +9,7 @@ module.exports = {
             firstname: req.body.firstname,
             lastname: req.body.lastname,
             age: req.body.age,
-            gender: req.body.gender,
-            elicitationId: req.body.elicitationId
+            gender: req.body.gender
         });
 
         const newUserPreferences = new Preferences({
@@ -18,17 +17,17 @@ module.exports = {
         });
 
         newUser.save()
-            .then((userDocument) => newUserPreferences.save())
-            .then((prefDocument) => {
+            .then((userDoc) => newUserPreferences.save())
+            .then((prefDoc) => {
                 console.log("New user registered: " + req.body.username);
 
                 res.status(200);
                 res.end();
             }).catch((error) => {
-                console.log("Cannot register new user: " + error);
+            console.log("Cannot register new user: " + error);
 
-                res.status(500);
-                next("Cannot register new user: " + error.message);
+            res.status(500);
+            next("Cannot register new user: " + error.message);
         });
     },
 
@@ -48,16 +47,16 @@ module.exports = {
         });
     },
 
-    //POST Handler - Check if user exists and return user
+    //POST Handler - Authenticate user and return user
     getUser: (req, res, next) => {
-        if(!req.params.username || !req.query.elicitationId) {
+        if(!req.params.username) {
             res.status(400);
-            next("Missing username or elicitationId");
+            next("Missing username");
 
             return;
         }
 
-        Users.findOne({$and: [{username: req.params.username}, {elicitationId: req.query.elicitationId}]},
+        Users.findOne({username: req.params.username},
             {_id: 0, username: 1, firstname: 1, lastname: 1, gender: 1, age: 1})
             .then((document) => {
                 if(!document) {
