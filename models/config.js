@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const configSchema = {
+const configSchema = mongoose.Schema({
     selectionMovies: {
         type: Number,
         required: true
@@ -15,6 +15,6 @@ const configSchema = {
         type: Number,
         required: true
     }
-};
+});
 
 module.exports = mongoose.model("Config", configSchema);
