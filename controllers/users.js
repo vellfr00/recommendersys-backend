@@ -6,6 +6,7 @@ module.exports = {
     registerUser: (req, res, next) => {
         const newUser = new Users({
             username: req.body.username,
+            password: req.body.password,
             firstname: req.body.firstname,
             lastname: req.body.lastname,
             age: req.body.age,
@@ -13,7 +14,8 @@ module.exports = {
         });
 
         const newUserPreferences = new Preferences({
-            username: req.body.username
+            username: req.body.username,
+            password: req.body.password
         });
 
         newUser.save()
@@ -49,7 +51,7 @@ module.exports = {
 
     //POST Handler - Authenticate user and return user
     getUser: (req, res, next) => {
-        if(!req.params.username) {
+        if(!req.params.username || !req.params.password) {
             res.status(400);
             next("Missing username");
 
