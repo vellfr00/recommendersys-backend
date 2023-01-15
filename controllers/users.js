@@ -51,14 +51,14 @@ module.exports = {
 
     //POST Handler - Authenticate user and return user
     getUser: (req, res, next) => {
-        if(!req.params.username || !req.params.password) {
+        if(!req.params.username) {
             res.status(400);
             next("Missing username or password!");
 
             return;
         }
 
-        Users.findOne({username: req.params.username,password: req.params.password},
+        Users.findOne({username: req.params.username},
             {_id: 0, username: 1, firstname: 1, lastname: 1, gender: 1, age: 1})
             .then((document) => {
                 if(!document) {
