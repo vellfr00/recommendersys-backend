@@ -53,12 +53,12 @@ module.exports = {
     getUser: (req, res, next) => {
         if(!req.params.username || !req.params.password) {
             res.status(400);
-            next("Missing username");
+            next("Missing username or password!");
 
             return;
         }
 
-        Users.findOne({username: req.params.username},
+        Users.findOne({username: req.params.username,password: req.params.password},
             {_id: 0, username: 1, firstname: 1, lastname: 1, gender: 1, age: 1})
             .then((document) => {
                 if(!document) {
