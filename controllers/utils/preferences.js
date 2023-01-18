@@ -3,11 +3,11 @@ const Config = require('../../models/config');
 module.exports = {
     /** SELECTION Preference utils **/
     //Check if data for sent for POST Selection preference is valid
-    selectionDataIsValid: async (proposed, choice) => {
+    selectionDataIsValid: async (proposed, choices) => {
         let config = await Config.findOne({});
 
-        let result = proposed && choice &&
-            proposed.length === choice.length &&
+        let result = proposed && choices &&
+            proposed.length === choices.length &&
             proposed.length >= config.minElicitIterations;
 
         if (!result)
@@ -16,7 +16,7 @@ module.exports = {
         //Choice must be present in proposed array
         let included = true;
         proposed.forEach((proposedIds, index) => {
-            if (!proposedIds.includes(choice[index]))
+            if (!proposedIds.includes(choices[index]))
                 included = false;
         });
 
@@ -28,15 +28,15 @@ module.exports = {
         let data = [];
 
         proposed.forEach((proposedIds, index) => {
-            let _p = proposedIds.map(p => ({movieId: p}));
+            let _p = proposedIds.map(p => ({ movieId: p }));
 
             data[index] = {
                 proposed: _p,
-                choice: {movieId: ch[index]}
+                choice: { movieId: ch[index] }
             };
         });
 
-        return {elicitationData: data};
+        return { elicitationData: data };
     },
 
     /** ORDERING Preference utils **/
@@ -67,8 +67,8 @@ module.exports = {
         let data = [];
 
         proposed.forEach((proposedIds, index) => {
-            let _p = proposedIds.map(p => ({movieId: p}));
-            let _c = choice[index].map(c => ({movieId: c}));
+            let _p = proposedIds.map(p => ({ movieId: p }));
+            let _c = choice[index].map(c => ({ movieId: c }));
 
             data[index] = {
                 proposed: _p,
@@ -76,6 +76,6 @@ module.exports = {
             };
         });
 
-        return {elicitationData: data};
+        return { elicitationData: data };
     }
 };
